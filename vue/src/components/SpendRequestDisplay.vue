@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { defineProps, onBeforeMount, ref, computed } from 'vue';
+import { onBeforeMount, ref, computed } from 'vue';
 import CampaignService from '../services/CampaignService';
 import Util from '../services/Util';
 
