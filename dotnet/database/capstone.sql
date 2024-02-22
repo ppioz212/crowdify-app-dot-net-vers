@@ -67,10 +67,34 @@ CREATE TABLE donation (
     anonymous BIT NOT NULL,
 
     CONSTRAINT pk_donation_id PRIMARY KEY (donation_id),
-    CONSTRAINT fk_campaign_id_2 FOREIGN KEY (campaign_id) REFERENCES campaign (campaign_id),
+    CONSTRAINT fk_campaign_id_donation FOREIGN KEY (campaign_id) REFERENCES campaign (campaign_id),
     CONSTRAINT fk_donor_user_id FOREIGN KEY (donor_id) REFERENCES users (user_id),
     CONSTRAINT valid_donation_amount CHECK (donation_amount > 0 AND donation_amount <= 50000000),
     CONSTRAINT anonymous_if_null_donor_id CHECK (donor_id IS NOT null OR anonymous = 1)
+);
+
+CREATE TABLE spend_request (
+    request_id int IDENTITY (1,1) NOT NULL,
+    campaign_id integer NOT NULL,
+    request_name varchar(50) NOT NULL,
+    request_amount integer NOT NULL, --TODO: constraint less than current funds - all donations minus all spend requests (should use trigger)
+    request_description varchar(500) NOT NULL,
+    request_approved BIT DEFAULT 0 NOT NULL,
+    end_date timestamp NOT NULL,
+
+    CONSTRAINT pk_request_id PRIMARY KEY (request_id),
+    CONSTRAINT fk_campaign_id_spend_request FOREIGN KEY (campaign_id) REFERENCES campaign,
+    CONSTRAINT request_amount_valid CHECK (request_amount > 0)
+);
+
+CREATE TABLE vote (
+    donor_id integer NOT NULL,
+    request_id integer NOT NULL,
+    vote_approved BIT DEFAULT NULL,
+
+    CONSTRAINT pk_donor_request_id PRIMARY KEY (donor_id, request_id),
+    CONSTRAINT fk_donor_user_id_vote FOREIGN KEY (donor_id) REFERENCES users (user_id),
+    CONSTRAINT fk_request_id FOREIGN KEY (request_id) REFERENCES spend_request (request_id)
 );
 
 --populate default data
